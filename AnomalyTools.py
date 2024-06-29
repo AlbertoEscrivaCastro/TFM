@@ -15,6 +15,7 @@ import	matplotlib.pyplot			as		plt
 import	Adapted_data_preprocessing
 os.chdir( './AnomalyBERT' )
 path									= os.getcwd()
+#	Habrá que cambiarlo por el adapted, pero creía que ya estaba hecho. ¿Dónde lo estamos usando?
 import	AnomalyBERT.utils.config	as		config
 from	AnomalyBERT.estimate		import	estimate
 from	AnomalyBERT.compute_metrics	import	f1_score
@@ -258,19 +259,21 @@ class AnomalyBERT_Analyzer_BIS( Tool ):
 		plt.title( 'Anomaly Scores' )
 		plt.show()
 
-# Vamos a necesitar una TOOL para preprocesamiento de datos.
-		# En un principio habíamos pensado crear Adapted_data_preprocesing.py, luego parecía que se podría usar data_preprocesing.py directamente.
 
 class AnomalyBERT_Data_Preprocessing( Tool ):
 	# This tool serves as an interface between the Agent and the Adapted_data_preprocessing.py library.
+	# 
 	name								= "AnomalyBERT_Data_Preprocessing"
 	## Falta retocar a partir de aquí.
-	description							= ( "This is a tool that preprocess datasets for the AnomalyBert anomaly analyzer and generates de directory for the preprocessed data. It takes as input the type of dataset (implemented for SWaT/SMAP/MSL/WADI) and the input data directory, optionaly it can also get as input the output data directory, the json directory and the date labe needed for WADI datasets. As output, it returns the directory where the preprocessed data has been stored." )
+	description							= 	(	"This is a tool that preprocess datasets for the AnomalyBert anomaly analyzer and generates de directory for the preprocessed data."
+					  						,	"It takes as input the type of dataset (implemented for SWaT/SMAP/MSL/WADI) and the input data directory, optionaly it can also get as input the output data directory, the json directory and the date labe needed for WADI datasets."
+											,	"As output, it returns the routes of the files where the preprocessed data has been stored."
+											)
 
 	inputs								= [ "text" ]
 	outputs								= [ "text" ]
 
-	# # Esto lo hemos añadido para intentar generalizar a diferentes modelos entrenados.
+	# Habrá que ver si esta herramienta necesita __init__(self).
 	# def __init__( self ):
 	# 	super().__init__(  )
 
@@ -296,4 +299,6 @@ class AnomalyBERT_Data_Preprocessing( Tool ):
 	# https://huggingface.co/docs/transformers/v4.38.2/en/main_classes/agent#transformers.Tool
 	def __call__( self , dataset_type , input_dataset_dir , output_dataset_dir = None , json_dataset_dir = None , date_label = None ):
 
-		preprocess_data( dataset_type , input_dataset_dir , output_dataset_dir , json_dataset_dir , date_label )
+		output_train_file_name , output_test_label_file_name , output_test_file_name , json_test_channel_file_name = Adapted_data_preprocessing.preprocess_data( dataset_type , input_dataset_dir , output_dataset_dir , json_dataset_dir , date_label )
+
+		return output_train_file_name , output_test_label_file_name , output_test_file_name , json_test_channel_file_name
