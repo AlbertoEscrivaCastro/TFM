@@ -13,10 +13,13 @@ import	matplotlib.pyplot			as		plt
 # %matplotlib inline
 
 import	Adapted_data_preprocessing
+import	Adapted_config				as		config
+
 os.chdir( './AnomalyBERT' )
 path									= os.getcwd()
-#	Habrá que cambiarlo por el adapted, pero creía que ya estaba hecho. ¿Dónde lo estamos usando?
-import	AnomalyBERT.utils.config	as		config
+#	Habrá que cambiarlo por el adapted, pero creía que ya estaba hecho. ¿Dónde lo estamos usando?ç
+#	Lo estamos usando en Experimentos2 y Experimentos3.
+# import	AnomalyBERT.utils.config	as		config
 from	AnomalyBERT.estimate		import	estimate
 from	AnomalyBERT.compute_metrics	import	f1_score
 os.chdir( os.path.dirname( path ) )
@@ -299,6 +302,6 @@ class AnomalyBERT_Data_Preprocessing( Tool ):
 	# https://huggingface.co/docs/transformers/v4.38.2/en/main_classes/agent#transformers.Tool
 	def __call__( self , dataset_type , input_dataset_dir , output_dataset_dir = None , json_dataset_dir = None , date_label = None ):
 
-		output_train_file_name , output_test_label_file_name , output_test_file_name , json_test_channel_file_name = Adapted_data_preprocessing.preprocess_data( dataset_type , input_dataset_dir , output_dataset_dir , json_dataset_dir , date_label )
+		preprocessed_dataset_folder = Adapted_data_preprocessing.preprocess_data( dataset_type , input_dataset_dir , output_dataset_dir , json_dataset_dir , date_label )
 
-		return output_train_file_name , output_test_label_file_name , output_test_file_name , json_test_channel_file_name
+		return preprocessed_dataset_folder

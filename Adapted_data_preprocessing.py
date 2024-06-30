@@ -23,12 +23,14 @@ datasets	=	[ 'SMD'
 				, 'WADI'
 				]
 
+
 # Hay que comprobar si realmente dataset y output_folder se necesitan aquí y en caso de hacerlo, informarlas apropiadamente.
 def load_as_np( category , filename , dataset , dataset_folder,  output_folder ):
 	temp = np.genfromtxt( os.path.join( dataset_folder , category , filename ) ,
 						 dtype = np.float32 ,
 						 delimiter = ',' )
 	return temp
+
 
 
 def load_data( dataset , base_dir , output_folder , json_folder , date_label , process_type ) :
@@ -232,10 +234,8 @@ def load_data( dataset , base_dir , output_folder , json_folder , date_label , p
 		abnormal_data	= abnormal_data.iloc[ : , 3 : -1	].to_numpy()
 		abnormal_data	= MinMaxScaler().fit_transform( abnormal_data ).clip( 0 , 1 )
 		np.save( output_test_file_name			, abnormal_data		)
-
-	# ¡¡ Convendría ver cómo hacer un return que pueda omitir campos a voluntad.
-	return output_train_file_name , output_test_label_file_name , output_test_file_name , json_test_channel_file_name
 		
+
 
 def preprocess_data( dataset , data_dir , out_dir = None , json_dir = None , date_label = None , process_type = "production" ):
 	if dataset in datasets:
@@ -260,26 +260,26 @@ def preprocess_data( dataset , data_dir , out_dir = None , json_dir = None , dat
 			date_label		= 'A2_19 Nov 2019'
 
 		# It could be interesting to validate date_label content.
-		output_train_file_name , output_test_label_file_name , output_test_file_name , json_test_channel_file_name = load_data( dataset , data_dir , output_folder , json_folder , date_label , process_type )
+		load_data( dataset , data_dir , output_folder , json_folder , date_label , process_type )
 
-		return output_train_file_name , output_test_label_file_name , output_test_file_name , json_test_channel_file_name
+		return output_folder
 
 
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument( "--dataset"		, required	= True	, type = str ,
-						help = "Name of dataset; SMD/SMAP/MSL/SWaT/WADI"					)
+						help = "Name of dataset; SMD/SMAP/MSL/SWaT/WADI"						)
 	parser.add_argument( "--data_dir"		, required	= True	, type = str ,
-						help = "Directory of raw data"										)
+						help = "Directory of raw data"											)
 	parser.add_argument( "--out_dir"		, default	= None	, type = str ,
-						help = "Directory of the processed data"							)
+						help = "Directory of the processed data"								)
 	parser.add_argument( "--json_dir"		, default	= None	, type = str ,
-						help = "Directory of the json files for the processed data"			)
+						help = "Directory of the json files for the processed data"				)
 	parser.add_argument( "--date_label"		, default	= None	, type = str ,
-						help = "Date label for WADI files in the shape 'A2_19 Nov 2019'"	)
+						help = "Date label for WADI files in the shape 'A2_19 Nov 2019'"		)
 	parser.add_argument( "--process_type"	, default	= None	, type = str ,
-						help = "Type of the preproccess to perform; train/test/production"	)
+						help = "Type of the preproccessing to perform; train/test/production"	)
 	options = parser.parse_args()
 
 	preprocess_data( options.dataset , options.data_dir , options.out_dir , options.json_dir , options.date_label , options.process_type )
