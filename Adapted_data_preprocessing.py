@@ -6,7 +6,7 @@
 import	ast
 import	csv
 import	os
-import	sys
+# import	sys
 from	pickle					import dump
 import	json
 
@@ -43,50 +43,36 @@ def load_data( dataset , base_dir , output_folder , json_folder , date_label , p
 	if process_type == 'train'	\
 	or process_type == 'test'	:
 		output_test_label_file_name	= os.path.join( output_folder	, dataset + "_test_label.npy"		)
-		#	¡¡¡ OJO !!! Relacionado con el resto de OJOs
-		#	Hay que ver si esto se usa sólo para el test o si se usa también para el procesamiento de producción.
-		#	Si también para PROD, sacar del IF.
-		json_test_channel_file_name	= os.path.join( json_folder		, dataset + "_test_channel.json"	)
+
 	else :
 		output_test_label_file_name	= None
-		#	¡¡¡ OJO !!! Relacionado con el resto de OJOs
-		#	Hay que ver si esto se usa sólo para el test o si se usa también para el procesamiento de producción.
-		#	Si también para PROD, BORRAR.
-		json_test_channel_file_name	= None
 
 	output_test_file_name			= os.path.join( output_folder	, dataset + "_test.npy"				)
+	json_test_channel_file_name		= os.path.join( json_folder		, dataset + "_test_channel.json"	)
 
 	if dataset == 'SMD':
-		dataset_folder = os.path.join( base_dir , 'OmniAnomaly/ServerMachineDataset' )
-#		file_list	= os.listdir( os.path.join( dataset_folder, "train"	) )
-		file_list	= os.listdir( os.path.join( dataset_folder, "test"	) )
+		dataset_folder				= os.path.join( base_dir , 'OmniAnomaly/ServerMachineDataset' )
+		file_list					= os.listdir( os.path.join( dataset_folder, "test"	) )
 		
-		train_files	= []
-		test_files	= []
-		label_files	= []
-		file_length	= [ 0 ]
+		train_files					= []
+		test_files					= []
+		label_files					= []
+		file_length					= [ 0 ]
 
 		for filename in file_list:
 			if filename.endswith( '.txt' )	:
 				if process_type == 'train'	:
-					train_files.append( load_as_np( 'train' , filename , filename.strip( '.txt' ) , dataset_folder , output_folder ) )
+					train_files.append( load_as_np( 'train'			, filename , filename.strip( '.txt' ) , dataset_folder , output_folder ) )
 				
 				if process_type == 'train'	\
 				or process_type == 'test'	:
-					label_files.append( load_as_np( 'test_label' , filename , filename.strip( '.txt' ) , dataset_folder , output_folder ) )
-					#	¡¡¡ OJO !!! Relacionado con el resto de OJOs
-					#	Hay que ver si esto se usa sólo para el test o si se usa también para el procesamiento de producción.
-					#	Si también PRODUCCIÓN usar test_files en vez de label_files y sacar del IF.
-					file_length.append( len( label_files[ -1 ] ) )
-					#	este print es sólo para poder comparar. QUITAR!!!
-					print( "label_files length: " , len( label_files[ -1 ] ) )
+					label_files.append( load_as_np( 'test_label'	, filename , filename.strip( '.txt' ) , dataset_folder , output_folder ) )
 				
 				test_files.append( load_as_np( 'test' , filename , filename.strip( '.txt' ) , dataset_folder , output_folder ) )
-				#	este print es sólo para poder comparar. QUITAR!!!
-				print( "test_files length: " , len( test_files[ -1 ] ) )
+				file_length.append( len( test_files[ -1 ] ) )
 		
 		for i, test in zip( range( len( test_files ) ) , test_files ) :
-			if process_type == 'train' :
+			if process_type == 'train'	:
 				np.save( os.path.join( output_folder , dataset + "{}_train.npy".format( i )			) , train_files[ i ]	)
 			
 			if process_type == 'train'	\
@@ -96,7 +82,7 @@ def load_data( dataset , base_dir , output_folder , json_folder , date_label , p
 			np.save( os.path.join( output_folder , dataset + "{}_test.npy".format( i )			) , test	)
 			
 
-		if process_type == 'train' :	
+		if process_type == 'train'	:	
 			train_files	= np.concatenate( train_files	, axis = 0 )
 			np.save( output_train_file_name , train_files	)
 		
@@ -104,24 +90,23 @@ def load_data( dataset , base_dir , output_folder , json_folder , date_label , p
 		or process_type == 'test'	:
 			label_files	= np.concatenate( label_files	, axis = 0 )
 			np.save( output_test_label_file_name , label_files	)
-			#	¡¡¡ OJO !!!
-			#	Hay que ver si esto se usa sólo para el test o si se usa también para el procesamiento de producción.
-			#	Si también apra Producción, sacar del IF, desde file_length hasta el json.dump, ambos inclusive.
-			file_length			= np.cumsum( np.array( file_length ) ).tolist()
-			channel_divisions	= []
 
-			for i in range( len( file_length ) - 1 ) :
-				channel_divisions.append( [ file_length[ i ] , file_length[ i + 1 ] ] )
-			with open( json_test_channel_file_name , 'w' ) as file :
-				json.dump( channel_divisions , file )
-
-		test_files	= np.concatenate( test_files	, axis = 0 )
+		test_files			= np.concatenate( test_files	, axis = 0 )
 		np.save( output_test_file_name , test_files	)
 
-#	¡¡¡ ADAPTAR A PARTIR DE AQUÍ AL INDICADOR process_type !!!
-	elif dataset == 'SMAP' \
-	  or dataset == 'MSL' :
-		dataset_folder = os.path.join( base_dir , 'telemanom/data' )
+		file_length			= np.cumsum( np.array( file_length ) ).tolist()
+		channel_divisions	= []
+
+		for i in range( len( file_length ) - 1 ) :
+			channel_divisions.append( [ file_length[ i ] , file_length[ i + 1 ] ] )
+		
+		with open( json_test_channel_file_name , 'w' ) as file :
+			json.dump( channel_divisions , file )
+
+
+	elif dataset == 'SMAP'	\
+	  or dataset == 'MSL'	:
+		dataset_folder		= os.path.join( base_dir , 'telemanom/data' )
 
 		labels				= []
 		class_divisions		= {}
@@ -134,18 +119,16 @@ def load_data( dataset , base_dir , output_folder , json_folder , date_label , p
 				csv_reader	= csv.reader( file, delimiter = ',' )
 				res			= [ row for row in csv_reader ][ 1 : ]
 			
-			res					= sorted( res , key = lambda k : k[ 0 ][ 0 ] + '-{:2d}'.format( int( k[ 0 ][ 2 : ] ) ) )
-	#		label_folder = os.path.join(dataset_folder, 'test_label')
-	#		if not os.path.exists(label_folder):
-	#			os.mkdir(label_folder)
-	#		makedirs(label_folder, exist_ok=True)
-			data_info			= [ row for row in res if row[ 1 ] == dataset and row[ 0 ] != 'P-2' ]
-	#		data_info = [row for row in res if row[1] == dataset]
+			res				= sorted( res , key = lambda k : k[ 0 ][ 0 ] + '-{:2d}'.format( int( k[ 0 ][ 2 : ] ) ) )
+
+			data_info		= [ row for row in res if row[ 1 ] == dataset and row[ 0 ] != 'P-2' ]
 
 		#	¡¡¡ OJO !!! Relacionado con el resto de OJOs
 		#	Hay que ver si esto se usa sólo para el test o si se usa también para el procesamiento de producción.
-		#	Si también PRODUCCIÓN, sacar del IF TRAIN OR TEST y usar el método de la tipología anterior, leyendo los nombres de ficheros de TEST. Ahora emplea la primera columna del CSV para tener una lista de los canales.
+		#	Si también PRODUCCIÓN (exploitation), sacar del IF TRAIN OR TEST y usar el método de la tipología anterior, leyendo los nombres de ficheros de TEST. Ahora emplea la primera columna del CSV para tener una lista de los canales.
 		#	Este FOR y los dos siguientes WITH OPEN, habría que separar del for cosas que se tendrían qeu quedar aquí (labels) y cosas que tendrían que salir fuera del IF TRAIN OR TEST (channels ¿y class divisions?).
+		#	Este es el último OJO que queda, el resto se ha decidido trasladar los elementos fuera del if como si se fuesen a usar durante "producción" porque se puede obtener los mismos datos sin usar los datos de etiquetas.
+		#	Este se ha dejado así por la complejidad que implicaría separar las tareas específicas para labels de las que se pueden obtener de los datos de test.
 			for row in data_info:
 				anomalies	= ast.literal_eval( row[ 2 ] )
 				length		= int( row[ -1 ] )
@@ -182,9 +165,6 @@ def load_data( dataset , base_dir , output_folder , json_folder , date_label , p
 				data.extend( temp )
 			
 			data = np.asarray( data )
-#			print(dataset, category, data.shape)
-#			with open(os.path.join(output_folder, dataset + "_" + category + ".pkl"), "wb") as file:
-#				dump(data, file)
 			data = MinMaxScaler().fit_transform( data )
 		
 		if process_type == 'train'	:
@@ -234,20 +214,20 @@ def load_data( dataset , base_dir , output_folder , json_folder , date_label , p
 		abnormal_data	= abnormal_data.iloc[ : , 3 : -1	].to_numpy()
 		abnormal_data	= MinMaxScaler().fit_transform( abnormal_data ).clip( 0 , 1 )
 		np.save( output_test_file_name			, abnormal_data		)
-		
 
 
-def preprocess_data( dataset , data_dir , out_dir = None , json_dir = None , date_label = None , process_type = "production" ):
+
+def preprocess_data( dataset , data_dir , out_dir = None , json_dir = None , date_label = None , process_type = None ):
 	if dataset in datasets:
-		if out_dir == None:
+		if out_dir == None :
 			output_folder	= os.path.join( data_dir , 'processed' )
 		else:
 			output_folder	= out_dir
 		
-		if not os.path.exists( output_folder ):
+		if not os.path.exists( output_folder ) :
 			os.mkdir( output_folder )
 		
-		if json_dir == None:
+		if json_dir == None :
 			json_folder		= os.path.join( data_dir , 'json' )
 		else:
 			json_folder		= json_dir
@@ -256,8 +236,11 @@ def preprocess_data( dataset , data_dir , out_dir = None , json_dir = None , dat
 			os.mkdir( json_folder )
 
 		if	dataset		== 'WADI'	\
-		and	date_label	== None		:
+		and	date_label	== None :
 			date_label		= 'A2_19 Nov 2019'
+
+		if process_type	== None :
+			process_type = "exploitation"
 
 		# It could be interesting to validate date_label content.
 		load_data( dataset , data_dir , output_folder , json_folder , date_label , process_type )
@@ -279,20 +262,7 @@ if __name__ == '__main__':
 	parser.add_argument( "--date_label"		, default	= None	, type = str ,
 						help = "Date label for WADI files in the shape 'A2_19 Nov 2019'"		)
 	parser.add_argument( "--process_type"	, default	= None	, type = str ,
-						help = "Type of the preproccessing to perform; train/test/production"	)
+						help = "Type of the preproccessing to perform; train/test/exploitation"	)
 	options = parser.parse_args()
 
 	preprocess_data( options.dataset , options.data_dir , options.out_dir , options.json_dir , options.date_label , options.process_type )
-
-
-#	commands = sys.argv[1:]
-#	load = []
-#	if len(commands) > 0:
-#		for d in commands:
-#			if d in datasets:
-#				load_data(d)
-#	else:
-#		print("""
-#		Usage: python data_preprocess.py <datasets>
-#		where <datasets> should be one of ['SMD', 'SMAP', 'MSL']
-#		""")
