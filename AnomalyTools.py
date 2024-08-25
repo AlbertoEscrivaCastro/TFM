@@ -1,19 +1,20 @@
 """Parts of codes are brought from https://github.com/Jhryu30/AnomalyBERT"""
 import	requests
-from	PIL							import	Image
-from	transformers				import	Tool
+from	PIL											import	Image
+from	transformers								import	Tool
 
 import	os
 import	sys
 import	inspect
 import	json
 import	torch
-import	numpy						as		np
-import	matplotlib.pyplot			as		plt
+import	numpy										as		np
+import	matplotlib.pyplot							as		plt
 # %matplotlib inline
 
-import	Adapted_data_preprocessing
-import	Adapted_config				as		config
+# import	Adapted_data_preprocessing
+import	Adapted_utils.Adapted_data_preprocessing	as		adp # type: ignore
+import	Adapted_utils.Adapted_config				as		config
 
 os.chdir( './AnomalyBERT' )
 path									= os.getcwd()
@@ -267,26 +268,24 @@ class AnomalyBERT_Data_Preprocessing( Tool ):
 	# This tool serves as an interface between the Agent and the Adapted_data_preprocessing.py library.
 	# 
 	name								= "AnomalyBERT_Data_Preprocessing"
-	# description							= 	(	"This tool preprocesses datasets of raw data for the AnomalyBert anomaly analyzer and generates a directory for the preprocessed data. Input parameters need to be explicitly stated with the specified name when used, and optional parameters should be avoided if not mentioned by the user in their prompt."
-					  						# ,	"Mandatory Input Parameters: 'dataset' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI), 'input_dir' (the input directory of the raw data, it must be a path written as a raw string). Optional Input Parameters (these parameters should be proviomitted if not explicitly mentioned by the user): 'output_dir' (the output directory for the preprocessed data, it must be a path written as a raw string), 'json_dir' (the directory where the JSON files will be saved if created. It must be a path written as a raw string), 'date_label' (the date label for WADI datasets) and 'process_type' (the type of process the dataset is intended for, valid options are train, test, and production)."
-					  						# ,	"Mandatory Input Parameters: 'dataset' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI), 'input_dir' (the input directory of the raw data, it must be a path written as a raw string). Optional Input Parameters (when using this function, optional parameters should be assigned values using keyword arguments; only provide these keyword arguments if their values are needed; otherwise, omit them entirely): 'output_dir' (the output directory for the preprocessed data, it must be a path written as a raw string), 'json_dir' (the directory where the JSON files will be saved if created. It must be a path written as a raw string), 'date_label' (the date label for WADI datasets) and 'process_type' (the type of process the dataset is intended for, valid options are train, test, and exploitation)."
-	description							= 	(	"This auxiliary tool is designed to support the primary process of satellite telemetry data analysis for anomaly detection using AnomalyBERT.\
-												 The specific task of this tool is to preprocess the dataset, preparing it for subsequent analysis.\
-												 This involves cleaning, normalizing, and transforming the raw telemetry data to ensure it is in an optimal format for the AnomalyBERT detection process."
-					  						,	"Mandatory Input Parameters:\
-													'dataset' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI),\
-													'input_dir' (the input directory of the raw data, it must be a path written as a raw string).\
-												 Optional Input Parameters (when using this function, optional parameters should be assigned values using keyword arguments;\
-												 only provide these keyword arguments if their values are needed; otherwise, omit them entirely):\
-													'output_dir' (the output directory for the preprocessed data, it must be a path written as a raw string),\
-													'json_dir' (the directory where the JSON files will be saved if created. It must be a path written as a raw string),\
-													'date_label' (the date label for WADI datasets)\
-													'dataset_mode' (The 'dataset_mode' parameter specifies the intended use and purpose of the dataset and can take one of the following values:\
-														'train', indicates that the dataset will be used for training the neural network, so it is labeled and provides the train and test partitions;\
-														'test', indicates that the dataset will be used just for testing the already trained neural network, so it is also labeled but only has the test partion;\
-														'exploitation', indicates that the dataset is intended to be analyzed and detect its anomalies (inference), so it's not labeled.)."
-											,	"As output, it returns the path of the files where the preprocessed data has been stored."
-											)
+	description							= \
+("This auxiliary tool is designed to support the primary process of satellite telemetry data analysis for anomaly detection using AnomalyBERT.\
+ The specific task of this tool is to preprocess the dataset, preparing it for subsequent analysis.\
+ This involves cleaning, normalizing, and transforming the raw telemetry data to ensure it is in an optimal format for the AnomalyBERT detection process."
+,"Mandatory Input Parameters:\
+ 'dataset' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI),\
+ 'input_dir' (the input directory of the raw data, it must be a path written as a raw string).\
+ Optional Input Parameters (when using this function, optional parameters should be assigned values using keyword arguments;\
+ only provide these keyword arguments if their values are needed; otherwise, omit them entirely):\
+ 'output_dir' (the output directory for the preprocessed data, it must be a path written as a raw string),\
+ 'json_dir' (the directory where the JSON files will be saved if created. It must be a path written as a raw string),\
+ 'date_label' (the date label for WADI datasets)\
+ 'dataset_mode' (The 'dataset_mode' parameter specifies the intended use and purpose of the dataset and can take one of the following values:\
+ 'train', indicates that the dataset will be used for training the neural network, so it is labeled and provides the train and test partitions;\
+ 'test', indicates that the dataset will be used just for testing the already trained neural network, so it is also labeled but only has the test partion;\
+ 'exploitation', indicates that the dataset is intended to be analyzed and detect its anomalies (inference), so it's not labeled.)."
+,"As output, it returns the path of the files where the preprocessed data has been stored."
+)
 
 	inputs								= [ "text" ]
 	outputs								= [ "text" ]
@@ -295,6 +294,6 @@ class AnomalyBERT_Data_Preprocessing( Tool ):
 	# https://huggingface.co/docs/transformers/v4.38.2/en/main_classes/agent#transformers.Tool
 	def __call__( self , dataset , input_dir , output_dir = None , json_dir = None , date_label = None , dataset_mode = None ):
 
-		preprocessed_dataset_folder = Adapted_data_preprocessing.preprocess_data( dataset , input_dir , output_dir , json_dir , date_label , dataset_mode )
+		preprocessed_dataset_folder = adp.preprocess_data( dataset , input_dir , output_dir , json_dir , date_label , dataset_mode )
 
 		return preprocessed_dataset_folder
