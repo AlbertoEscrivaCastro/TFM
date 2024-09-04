@@ -4,9 +4,6 @@
 import os
 
 PROJECT_DIR				= os.path.dirname( os.path.abspath( os.path.dirname( __file__ ) ) )
-# DEFAULT_DATASET_DIR		= '/Users/zoiyy/OneDrive/Documentos/DataSets/TFM/AnomalyBERT/processed'
-# LOG_DIR					= 'logs/'
-# DATA_PROPERTY_DIR		= 'data/'
 DEFAULT_DATASET_DIR		= '\\Users\\zoiyy\\OneDrive\\Documentos\\DataSets\\TFM\\AnomalyBERT\\processed'
 LOG_DIR					= 'logs\\'
 DATA_PROPERTY_DIR		= 'data\\'
@@ -49,7 +46,7 @@ IGNORED_COLUMNS			=	{ 'SWaT'	: ( 10 , )
 							, 'WADI'	: ( 102 , )
 							}
 
-def set_directory( custom_dataset_dir = DEFAULT_DATASET_DIR ) :
+def set_directory( custom_dataset_dir = None ) :
 	global DATASET_DIR , TRAIN_DATASET , TEST_DATASET , TEST_LABEL , DEFAULT_DIVISION , NUMERICAL_COLUMNS , CATEGORICAL_COLUMNS
 
 	if custom_dataset_dir == None :
@@ -90,4 +87,4 @@ def set_directory( custom_dataset_dir = DEFAULT_DATASET_DIR ) :
 
 
 
-	
+# ^(;,;)^ #

@@ -12,9 +12,9 @@ import	json
 
 import	argparse
 
-import	numpy	as np
-import	pandas	as pd
-from	sklearn.preprocessing	import MinMaxScaler
+import	numpy	as np									# type: ignore 
+import	pandas	as pd									# type: ignore 
+from	sklearn.preprocessing	import MinMaxScaler		# type: ignore 
 
 datasets	=	[ 'SMD'
 				, 'SMAP'
@@ -24,7 +24,8 @@ datasets	=	[ 'SMD'
 				]
 
 
-# Hay que comprobar si realmente dataset y output_folder se necesitan aquí y en caso de hacerlo, informarlas apropiadamente.
+# The fields dataset and output_folder seem to be unnecessarily included here in the AnomalyBERT original version.
+# Removing them from here should be considered.
 def load_as_np( category , filename , dataset , dataset_folder,  output_folder ):
 	temp = np.genfromtxt( os.path.join( dataset_folder , category , filename ) ,
 						 dtype = np.float32 ,
@@ -266,3 +267,7 @@ if __name__ == '__main__':
 	options = parser.parse_args()
 
 	preprocess_data( options.dataset , options.data_dir , options.out_dir , options.json_dir , options.date_label , options.process_type )
+
+
+
+# ^(;,;)^ #
