@@ -13,11 +13,14 @@ import	json
 path		= os.path.dirname(__file__)
 parent_dir	= os.path.abspath(os.path.join( path , '..'))
 sys.path.insert(0, parent_dir)
-import	Adapted_utils.Adapted_data_preprocessing	as	adp		# type: ignore
-import	Adapted_utils.Adapted_config				as	config	# type: ignore
-from	AnomalyBERT.estimate					import	estimate
+import	Adapted_utils.Adapted_data_preprocessing	as	adp			# type: ignore
+import	Adapted_utils.Adapted_config				as	config		# type: ignore
 sys.path.insert(0, path)
 
+path		= os.getcwd()
+os.chdir( os.path.dirname( os.getcwd() ) + '/AnomalyBERT' )
+from	estimate								import	estimate	# type: ignore
+os.chdir( path )
 
 
 
@@ -54,8 +57,8 @@ class AnomalyBERT_Anomaly_Analysis_Tool( Tool ):
 		self.model						= dict()
 
 	def setup( self , dataset ):
-		os.chdir( './AnomalyBERT' )
 		path							= os.getcwd()
+		os.chdir( os.path.dirname( os.getcwd() ) + '/AnomalyBERT' )
 		
 		if torch.cuda.is_available():
 			self.device					= torch.device( 'cuda'	)
@@ -63,7 +66,7 @@ class AnomalyBERT_Anomaly_Analysis_Tool( Tool ):
 			self.device					= torch.device( 'cpu'	)
  
 		self.model[ dataset ]			= torch.load( 'logs/best_checkpoints/' + dataset + '_parameters.pt' , map_location = self.device )
-		os.chdir( os.path.dirname( path ) )
+		os.chdir( path )
 		print( "Anomaly BERT model for " + dataset + " loaded: \n")
 		print( self.model[ dataset ].eval() )
 		self.is_initialized[ dataset ]	= True

@@ -90,14 +90,14 @@ class AnomalyBERT_Analyzer( Tool ):
  which needs the data to be already prerocessed.\
  It takes as input the type of dataset (implemented for SWaT/SMAP/MSL/WADI) and returns its plot with the anomalies higlighted."
 ,"Mandatory Input Parameters:\
- 'dataset_type' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI),\
+ - 'dataset_type' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI),\
  Optional Input Parameters (when using this function, optional parameters should be assigned values using keyword arguments;\
  only provide these optional parameters if their values are needed; otherwise, omit them entirely):\
- 'preprocessed_dataset_folder' (the input directory of the preprocessed data, it must be a path written as a raw string).\
- 'dataset_mode' (The 'dataset_mode' parameter specifies the intended use and purpose of the dataset and can take one of the following values:\
- 'train', indicates that the dataset will be used for training the neural network, so it is labeled and provides the train and test partitions;\
- 'test', indicates that the dataset will be used just for testing the already trained neural network, so it is also labeled but only has the test partion;\
- 'exploitation', indicates that the dataset is intended to be analyzed and detect its anomalies (inference), so it's not labeled.)."
+ - 'preprocessed_dataset_folder' (the input directory of the preprocessed data, it must be a path written as a raw string).\
+ - 'dataset_mode' (The 'dataset_mode' parameter specifies the intended use and purpose of the dataset and can take one of the following values:\
+ * 'train', indicates that the dataset will be used for training the neural network, so it is labeled and provides the train and test partitions;\
+ * 'test', indicates that the dataset will be used just for testing the already trained neural network, so it is also labeled but only has the test partion;\
+ * 'exploitation', indicates that the dataset is intended to be analyzed and detect its anomalies (inference), so it's not labeled.)."
 ,"As output, it returns the path of the files where the anomaly scores have been stored after the analysis and plots the results."
 )
 
