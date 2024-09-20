@@ -18,7 +18,7 @@ import	Adapted_utils.Adapted_config				as	config		# type: ignore
 sys.path.insert(0, path)
 
 path		= os.getcwd()
-os.chdir( os.path.dirname( os.getcwd() ) + '/AnomalyBERT' )
+os.chdir( os.path.join( os.path.dirname( os.getcwd() ) , 'AnomalyBERT' ) )
 from	estimate								import	estimate	# type: ignore
 os.chdir( path )
 
@@ -58,7 +58,7 @@ class AnomalyBERT_Anomaly_Analysis_Tool( Tool ):
 
 	def setup( self , dataset ):
 		path							= os.getcwd()
-		os.chdir( os.path.dirname( os.getcwd() ) + '/AnomalyBERT' )
+		os.chdir( os.path.join( os.path.dirname( os.getcwd() ) , 'AnomalyBERT' ) )
 		
 		if torch.cuda.is_available():
 			self.device					= torch.device( 'cuda'	)
@@ -92,14 +92,15 @@ class AnomalyBERT_Anomaly_Analysis_Tool( Tool ):
 		if test_divisions == 'total':
 				test_divisions			= [ [ 0 , len( test_data ) ] ]
 		else:
-			os.chdir( './AnomalyBERT' )
+			path							= os.getcwd()
+			os.chdir( os.path.join( os.path.dirname( os.getcwd() ) , 'AnomalyBERT' ) )
 			
 			with open( config.DATA_DIVISION[ dataset_type ][ test_divisions ] , 'r' ) as f:
 				test_divisions			= json.load( f )
 			if isinstance( test_divisions , dict ):
 				test_divisions			= test_divisions.values()
 
-			os.chdir( os.path.dirname( os.getcwd() ) )
+			os.chdir( path )
 
 		# Ignore the specific columns.
 		if dataset_type in config.IGNORED_COLUMNS.keys():

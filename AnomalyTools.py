@@ -16,13 +16,22 @@ import	matplotlib.pyplot							as	plt
 import	Adapted_utils.Adapted_data_preprocessing	as	adp			# type: ignore
 import	Adapted_utils.Adapted_config				as	config
 
-os.chdir( './AnomalyBERT' )
-#	Habrá que cambiarlo por el adapted, pero creía que ya estaba hecho. ¿Dónde lo estamos usando?
-#	Lo estamos usando en Experimentos2 y Experimentos3.
-# import	AnomalyBERT.utils.config	as		config
+def	set_path_to_AnomalyBERT():
+	execution_path		= os.getcwd()
+	main_folder_name	= 'TFM'
+	if os.path.basename( os.path.normpath( execution_path ) ) != main_folder_name:
+		path			= os.path.dirname( execution_path )
+	else:
+		path			= execution_path
+
+	os.chdir( os.path.join( path , 'AnomalyBERT' ) )
+
+	return execution_path
+
+execution_path	= set_path_to_AnomalyBERT()
 from	AnomalyBERT.estimate					import	estimate
 from	AnomalyBERT.compute_metrics				import	f1_score
-os.chdir( os.path.dirname( os.getcwd() ) )
+os.chdir( execution_path )
 
 
 
@@ -56,7 +65,7 @@ class AnomalyBERT_Data_Preprocessing( Tool ):
  The specific task of this tool is to preprocess the dataset, preparing it for subsequent analysis.\
  This involves cleaning, normalizing, and transforming the raw telemetry data to ensure it is in an optimal format for the AnomalyBERT detection process."
 ,"Mandatory Input Parameters:\
- 'dataset' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI),\
+ 'dataset_type' (the type of dataset, permitted options are SWaT, SMAP, MSL, and WADI),\
  'input_dir' (the input directory of the raw data, it must be a path written as a raw string).\
  Optional Input Parameters (when using this function, optional parameters should be assigned values using keyword arguments;\
  only provide these keyword arguments if their values are needed; otherwise, omit them entirely):\
@@ -75,9 +84,9 @@ class AnomalyBERT_Data_Preprocessing( Tool ):
 
 # ¿referencia https://github.com/huggingface/transformers/blob/v4.38.1/src/transformers/tools/text_summarization.py ?
 	# https://huggingface.co/docs/transformers/v4.38.2/en/main_classes/agent#transformers.Tool
-	def __call__( self , dataset , input_dir , output_dir = None , json_dir = None , date_label = None , dataset_mode = None ):
+	def __call__( self , dataset_type , input_dir , output_dir = None , json_dir = None , date_label = None , dataset_mode = None ):
 
-		preprocessed_dataset_folder = adp.preprocess_data( dataset , input_dir , output_dir , json_dir , date_label , dataset_mode )
+		preprocessed_dataset_folder = adp.preprocess_data( dataset_type , input_dir , output_dir , json_dir , date_label , dataset_mode )
 
 		return preprocessed_dataset_folder
 
@@ -104,27 +113,28 @@ class AnomalyBERT_Analyzer( Tool ):
 	inputs								= [ "text" ]
 	outputs								= [ "text" ]
 
-	# Esto lo hemos añadido para intentar generalizar a diferentes modelos entrenados.
+	# This has been aded to generalize the abailability of trained models.
+	# This way, we have a dictionary of loaded models and flags with shared keys.
+	# Instead of using the flag dictionary self.is_initialized, we could have just checked for the existance of a particular key in the model dictionary.
 	def __init__( self ):
 		super().__init__(  )
 
 		self.is_initialized				= dict()
 		self.model						= dict()
 
-	def setup( self , dataset ):
-		os.chdir( './AnomalyBERT' )
-		path							= os.getcwd()
+	def setup( self , dataset_type ):
+		execution_path	= set_path_to_AnomalyBERT()
 		
 		if torch.cuda.is_available():
 			self.device					= torch.device( 'cuda'	)
 		else:
 			self.device					= torch.device( 'cpu'	)
  
-		self.model[ dataset ]			= torch.load( 'logs/best_checkpoints/' + dataset + '_parameters.pt' , map_location = self.device )
-		os.chdir( os.path.dirname( path ) )
-		print( "Anomaly BERT model for " + dataset + " loaded: \n")
-		print( self.model[ dataset ].eval() )
-		self.is_initialized[ dataset ]	= True
+		self.model[ dataset_type ]			= torch.load( 'logs/best_checkpoints/' + dataset_type + '_parameters.pt' , map_location = self.device )
+		os.chdir( execution_path )
+		print( "Anomaly BERT model for " + dataset_type + " loaded: \n")
+		print( self.model[ dataset_type ].eval() )
+		self.is_initialized[ dataset_type ]	= True
 
 	# ¿referencia https://github.com/huggingface/transformers/blob/v4.38.1/src/transformers/tools/text_summarization.py ?
 	# https://huggingface.co/docs/transformers/v4.38.2/en/main_classes/agent#transformers.Tool
@@ -149,14 +159,14 @@ class AnomalyBERT_Analyzer( Tool ):
 		if test_divisions == 'total':
 				test_divisions			= [ [ 0 , len( test_data ) ] ]
 		else:
-			os.chdir( './AnomalyBERT' )
+			execution_path	= set_path_to_AnomalyBERT()
 			
 			with open( config.DATA_DIVISION[ dataset_type ][ test_divisions ] , 'r' ) as f:
 				test_divisions			= json.load( f )
 			if isinstance( test_divisions , dict ):
 				test_divisions			= test_divisions.values()
 
-			os.chdir( os.path.dirname( os.getcwd() ) )
+			os.chdir( execution_path )
 
 		# Ignore the specific columns.
 		if dataset_type in config.IGNORED_COLUMNS.keys():
@@ -169,7 +179,6 @@ class AnomalyBERT_Analyzer( Tool ):
 		anomaly_scores					= anomaly_scores.cpu().numpy()
 
 		# Store the estimations.
-		# Esto... esto no está bien... falta averiguar qué meter en lo del state_dict y quizá ya esté, pero me preocupa lo del model.eval() del main de estimate...
 		analysis_output_file			= config.TEST_DATASET[ dataset_type ][ : -4 ] + '_results.npy' if analysis_output_file == None else analysis_output_file
 		print( analysis_output_file )
 		np.save( analysis_output_file , anomaly_scores )
@@ -220,11 +229,13 @@ class AnomalyBERT_Analyzer( Tool ):
 
 		return analysis_output_file
 
+
+# Both tools could be wrapped into a PipelineTool(). Future modification. This is just a reference example of a different tool.
 # class AnomalyBERTAnalyzer(PipelineTool):
 #	 default_checkpoint = "google/flan-t5-base"
 #	 description = (
-#	   	his is a tool that answers questions related to a text. It takes two arguments named `text`, which is the "
-#	   	ext where to find the answer, and `question`, which is the question, and returns the answer to the question."
+#	   	his is a tool that answers questions related to a text. It takes two arguments named 'text', which is the "
+#	   	ext where to find the answer, and 'question', which is the question, and returns the answer to the question."
 #	 )
 #	 name = "text_qa"
 #	 pre_processor_class = AutoTokenizer
