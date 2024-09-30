@@ -7,12 +7,11 @@ https://github.com/Jhryu30/AnomalyBERT    -->  Este repositorio debe ponerse den
 
 
 ### - VERSIONES -
-Por temas de compatibilidad se han empleado:
+Se han seguido las instrucciones de instalación del entorno, así como versiones y requerimientos de https://github.com/Jhryu30/AnomalyBERT a excepción de:
 
-    - python 3.8
-    - torch 2.2.0
+    torch 2.2.0
 
-También se ha tenido que realizar el siguietne ajuste en las librerías:
+También se ha tenido que realizar el siguiente ajuste en las librerías:
 En ".\Python\Python38\site-packages\torch\nn\modules\activation.py" reemplazar la clase GELU por la verisón anterior mostrada a continuación ( https://github.com/czg1225/SlimSAM/issues/1 ):
 
     class GELU(Module):
@@ -37,3 +36,5 @@ En ".\Python\Python38\site-packages\torch\nn\modules\activation.py" reemplazar l
         """
         def forward(self, input: Tensor) -> Tensor:
             return F.gelu(input)
+
+De este modo se compatibiliza AnomalyBERT con los Transformer Agents.
