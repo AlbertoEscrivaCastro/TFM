@@ -1,16 +1,19 @@
-# TFM
-TFM del Máster de IA de Alberto Escrivá Castro
+# Detección de Anomalías en
+# Telemetría de Satélites mediante IA
+# Generativa y Agentes Autónomos
 
-- DEPENDENCIAS -
+Autor: Alberto Escrivá Castro
+
+### - DEPENDENCIAS -
 https://github.com/Jhryu30/AnomalyBERT    -->  Este repositorio debe ponerse dentro de este proyecto para que funcione, quedando: ./TFM/AnomalyBERT/
 
 
-- VERSIONES -
+### - VERSIONES -
 Por temas de compatibilidad se han empleado:
 python 3.8
 torch 2.2.0
 
-Y se ha tenido que realizar el siguietne ajuste en las librerías:
+También se ha tenido que realizar el siguietne ajuste en las librerías:
 En ".\Python\Python38\site-packages\torch\nn\modules\activation.py" reemplazar la clase GELU por la verisón anterior mostrada a continuación ( https://github.com/czg1225/SlimSAM/issues/1 ):
 
     class GELU(Module):
