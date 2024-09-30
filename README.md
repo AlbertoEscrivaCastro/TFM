@@ -1,6 +1,4 @@
-# Detección de Anomalías en
-# Telemetría de Satélites mediante IA
-# Generativa y Agentes Autónomos
+# Detección de Anomalías en Telemetría de Satélites mediante IA Generativa y Agentes Autónomos
 
 Autor: Alberto Escrivá Castro
 
