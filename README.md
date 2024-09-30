@@ -8,6 +8,7 @@ https://github.com/Jhryu30/AnomalyBERT    -->  Este repositorio debe ponerse den
 
 ### - VERSIONES -
 Por temas de compatibilidad se han empleado:
+
     - python 3.8
     - torch 2.2.0
 
