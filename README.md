@@ -9,7 +9,8 @@ https://github.com/Jhryu30/AnomalyBERT    -->  Este repositorio debe ponerse den
 ### - VERSIONES -
 Se han seguido las instrucciones de instalación del entorno, así como versiones y requerimientos de https://github.com/Jhryu30/AnomalyBERT a excepción de:
 
-    torch 2.2.0
+    Python 3.8.18
+    PyTortch 2.2.0+cu118
 
 También se ha tenido que realizar el siguiente ajuste en las librerías:
 En ".\Python\Python38\site-packages\torch\nn\modules\activation.py" reemplazar la clase GELU por la verisón anterior mostrada a continuación ( https://github.com/czg1225/SlimSAM/issues/1 ):
