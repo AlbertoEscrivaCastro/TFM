@@ -13,25 +13,25 @@ torch 2.2.0
 Y se ha tenido que realizar el siguietne ajuste en las librerías:
 En ".\Python\Python38\site-packages\torch\nn\modules\activation.py" reemplazar la clase GELU por la verisón anterior mostrada a continuación ( https://github.com/czg1225/SlimSAM/issues/1 ):
 
-class GELU(Module):
-    r"""Applies the Gaussian Error Linear Units function:
+    class GELU(Module):
+        r"""Applies the Gaussian Error Linear Units function:
 
-    .. math:: \text{GELU}(x) = x * \Phi(x)
+        .. math:: \text{GELU}(x) = x * \Phi(x)
 
-    where :math:`\Phi(x)` is the Cumulative Distribution Function for Gaussian Distribution.
+        where :math:`\Phi(x)` is the Cumulative Distribution Function for Gaussian Distribution.
 
-    Shape:
-        - Input: :math:`(N, *)` where `*` means, any number of additional
-          dimensions
-        - Output: :math:`(N, *)`, same shape as the input
+        Shape:
+            - Input: :math:`(N, *)` where `*` means, any number of additional
+              dimensions
+            - Output: :math:`(N, *)`, same shape as the input
 
-    .. image:: ../scripts/activation_images/GELU.png
+        .. image:: ../scripts/activation_images/GELU.png
 
-    Examples::
+        Examples::
 
-        >>> m = nn.GELU()
-        >>> input = torch.randn(2)
-        >>> output = m(input)
-    """
-    def forward(self, input: Tensor) -> Tensor:
-        return F.gelu(input)
+            >>> m = nn.GELU()
+            >>> input = torch.randn(2)
+            >>> output = m(input)
+        """
+        def forward(self, input: Tensor) -> Tensor:
+            return F.gelu(input)
